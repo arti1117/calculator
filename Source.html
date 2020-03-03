@@ -1,0 +1,300 @@
+<!-- footnote -->
+
+<html>
+
+	<head>
+
+		<meta charset="UTF-8">
+
+		<script>
+			
+			var str = new String();
+			var sub = new String();
+			var arr = new Array();
+			var cnt = new Number();
+			var fir = new Number();
+
+			var cons0 = new Number(0);
+			var cons1 = new Number(1);
+			var cons2 = new Number(2);
+			var cons3 = new Number(3);
+			var cons4 = new Number(4);
+
+			var reg1 = new RegExp(/^[0-9]$/);
+			var reg2 = new RegExp(/^[.]$/);
+			
+			//연산합수
+			function plusNum(a,b) {return parseFloat(a)+parseFloat(b);}
+			function minusNum(a,b) {return parseFloat(a)-parseFloat(b);}
+			function multiplyNum(a,b) {return parseFloat(a)*parseFloat(b);}
+			function divideNum(a,b) {return parseFloat(a)/parseFloat(b);}
+
+			var oper = ["+","-","*","/","."];
+
+			// 출력함수
+			function dial(a)
+			{
+				if (str.length>cons1)
+				{
+					for (var i=cons0;i<oper.length;i++)
+					{
+						if (str.charAt(str.length-cons1)==oper[i])
+						{
+							for (var j=cons0;j<oper.length;j++)
+							{
+								if (a==oper[j])
+								{
+									a="";
+								}
+							}
+						}
+					}
+				}
+
+				if (cnt==cons1 && a==".")
+				{
+					str=str;
+					a="";
+				}
+				if (cnt==cons1 && (a=="+" || a=="-" || a=="*" || a=="/"))
+				{
+					cnt--;
+				}
+				if (cnt==cons0 && a==".")
+				{
+					cnt++;
+				}
+
+				str = str + a;
+
+				if (str.charAt(cons0)=="+" || str.charAt(cons0)=="-" || str.charAt(cons0)=="*" || str.charAt(cons0)=="/")
+				{
+					str="";
+					a="";
+				}
+				if (str.charAt(cons0)==".")
+				{
+					str="0"+a;
+				}
+
+				entry(a);
+				document.regForm.process.focus();
+				document.regForm.process.value=str;
+			}
+
+			//입력함수
+			function entry(a)
+			{	
+				if (a=="+" || a=="-" || a=="*" || a=="/")
+				{
+					arr.push(sub);
+					arr.push(a);
+					sub="";
+					a="";
+				}
+				if (reg1.test(a) || reg2.test(a))
+				{
+					sub=sub+a;
+					a="";
+				}
+			}
+
+			//계산함수
+			function endingPro()
+			{
+				if (str.charAt(str.length-cons1)==".")
+				{
+					str=str+"0";
+					sub=sub+"0";
+				}
+				if (fir==0 && str.length==cons0)
+				{
+					alert("하나라도 입력하시오.");
+					document.regForm.process.focus();
+				}
+				else if (str.charAt(str.length-cons1)=="+" || str.charAt(str.length-cons1)=="-" 
+						|| str.charAt(str.length-cons1)=="*" || str.charAt(str.length-cons1)=="/")
+				{
+					alert("연산으로 끝나는 계산은 없다.");
+					document.regForm.process.focus();
+				}
+				else if (str.indexOf("+")<cons0 && str.indexOf("-")<cons0 && str.indexOf("*")<cons0 && str.indexOf("/")<cons0)
+				{
+					alert("숫자로만 구성된 것은 계산을 할 수 없다.");
+					document.regForm.process.focus();					
+				}
+				else
+				{
+					if (fir==0)
+					{
+						arr.push(sub);
+						sub="";
+						fir++;
+					}
+
+					if (arr.length==cons3)
+					{
+						if (arr[cons1]=="*")
+						{
+							str=multiplyNum(arr[cons0],arr[cons2]);
+						}
+						else if (arr[cons1]=="/")
+						{
+							str=divideNum(arr[cons0],arr[cons2]);
+						}
+						else if (arr[cons1]=="+")
+						{
+							str=plusNum(arr[cons0],arr[cons2]);							
+						}
+						else if (arr[cons1]=="-")
+						{
+							str=minusNum(arr[cons0],arr[cons2]);							
+						}
+						document.regForm.process.value=str;
+						str = "";
+						sub = "";
+						arr = new Array();
+						cnt = 0;
+						fir = 0;
+					}
+					else
+					{
+						multiPro();
+					}
+				}
+			}
+
+			function multiPro()
+			{
+				if (arr[cons1]=="/")
+				{
+					arr[cons0]=divideNum(arr[cons0],arr[cons2]);
+					arr.splice(cons1,cons2);
+					endingPro();
+				}
+				else if (arr[cons1]=="*")
+				{
+					arr[cons0]=multiplyNum(arr[cons0],arr[cons2]);
+					arr.splice(cons1,cons2);
+					endingPro();
+				}
+				else if (arr[cons1]=="-")
+				{
+					for (var i=cons3;i<arr.length;i=i+cons2 )
+					{
+						if (arr[i]=="/")
+						{
+							arr[i-cons1]=divideNum(arr[i-cons1],arr[i+cons1]);
+							arr.splice(i,cons2);
+							return endingPro();
+						}
+						else if (arr[i]=="*")
+						{
+							arr[i-cons1]=multiplyNum(arr[i-cons1],arr[i+cons1]);
+							arr.splice(i,cons2);
+							return endingPro();
+						}
+					}
+					arr[cons0]=minusNum(arr[cons0],arr[cons2]);
+					arr.splice(cons1,cons2);
+					endingPro();
+				}
+				else if (arr[cons1]=="+")
+				{
+					for (var i=cons3;i<arr.length;i=i+cons2 )
+					{
+						if (arr[i]=="/")
+						{
+							arr[i-cons1]=divideNum(arr[i-cons1],arr[i+cons1]);
+							arr.splice(i,cons2);
+							return endingPro();
+						}
+						else if (arr[i]=="*")
+						{
+							arr[i-cons1]=multiplyNum(arr[i-cons1],arr[i+cons1]);
+							arr.splice(i,cons2);
+							return endingPro();
+						}
+					}
+					arr[cons0]=plusNum(arr[cons0],arr[cons2]);
+					arr.splice(cons1,cons2);
+					endingPro();
+				}
+			}
+
+			// 지우기
+			function resetNum()
+			{
+				str = "";
+				sub = "";
+				arr = new Array();
+				cnt = 0;
+				fir = 0;
+				document.regForm.process.value=str;
+				document.regForm.process.focus(); 
+			}
+
+		</script>
+
+	</head>
+
+	<body onLoad="document.regForm.process.focus()"><center>
+
+		<form name="regForm" method="post" >
+
+			<table border=1 bordercolor="brown" cellpadding="3">
+
+			<caption>[Calculator]</caption>
+
+			<tr>
+				<th>
+					<input type="text" name="process" size=10>
+				</th>
+			</tr>
+
+			<tr>
+				<td>
+					<input type="button" value=" 7 " onClick="dial('7')">
+					<input type="button" value=" 8 " onClick="dial('8')">
+					<input type="button" value=" 9 " onClick="dial('9')">
+					<input type="button" value="  /  " onClick="dial('/')">
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<input type="button" value=" 4 " onClick="dial('4')">
+					<input type="button" value=" 5 " onClick="dial('5')">
+					<input type="button" value=" 6 " onClick="dial('6')">
+					<input type="button" value="  *  " onClick="dial('*')">
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<input type="button" value=" 1 " onClick="dial('1')">
+					<input type="button" value=" 2 " onClick="dial('2')">
+					<input type="button" value=" 3 " onClick="dial('3')">
+					<input type="button" value="  -  " onClick="dial('-')">
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<input type="button" value="   0   " onClick="dial('0')">
+					<input type="button" value=" . " onClick="dial('.')">
+					<input type="button" value="  +  " onClick="dial('+')">
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<input type="button" value="     =     " onClick="endingPro()">
+					<input type="button" value=" C " onClick="resetNum()">
+				</td>
+			</tr>
+		</table>
+
+	</body>
+
+</html>
